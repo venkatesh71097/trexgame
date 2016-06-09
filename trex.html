@@ -1,0 +1,184 @@
+<html>
+<head>
+	
+<title>TREX GAME</title>
+	
+<style>
+canvas{
+	position:relative;
+	
+}
+</style>
+</head>
+<body onload="startGame()">
+	
+<script>
+var player;
+var ctr=0;
+var count = 0;
+var myObstacle = [];
+var randPos = 0;
+var myBackground1,myBackground2;
+function startGame(){
+    myScore = new component("30px", "Consolas", "black", 280, 40, "text");
+	myGameArea.start();
+    mySound = new sound("siren.mp3");
+	player = new component(80,50,"trex.png",50,175,"image");
+	myBackground1 = new component(480,270,"trexbg.png",0,0,"background");
+	myBackground2 = new component(480,270,"trexbg.png",0,0,"background");
+	}
+var myGameArea = {
+	canvas: document.createElement("canvas"),
+	start: function(){
+		this.frameNo = 0;
+		this.canvas.width = 480;
+		this.canvas.height = 270;
+		this.context = this.canvas.getContext('2d');
+                            document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+		
+		this.interval = setInterval(updateArena,4);
+		window.addEventListener('keydown',function(e){
+			myGameArea.key = e.keyCode;
+		})
+		window.addEventListener('keyup',function(e){
+			myGameArea.key = false;
+		})
+		
+	},
+	clear: function(){
+		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+	},
+	stop: function(){
+		clearInterval(this.interval);
+	}
+}
+function component(width,height,color,x,y,type){
+	this.type = type;
+	if(type == "image" || type == "background"){
+		this.image= new Image();
+		this.image.src = color;
+	}
+	this.width = width;
+	this.height = height;
+               this.speedX = 0;
+               this.speedY = 0;    
+	this.x = x;
+	this.y = y;
+	this.update = function(){
+		ctx = myGameArea.context;
+		if(type == "image" || type == "background"){
+			ctx.drawImage(this.image,this.x,this.y,this.width,this.height);
+		}
+
+ else{
+			ctx.fillStyle = color;
+			ctx.fillRect(this.x,this.y,this.width,this.height);
+		}
+		
+	}
+	this.newPos = function(){
+		this.x+=this.speedX;
+		this.y+=this.speedY;
+		if(this.type == "background"){
+			if(this.x == -(this.width)){
+				this.x=0;
+			}
+		}
+	}
+	this.crashWith = function(otherobj) {
+        var myleft = this.x+30;
+        var myright = this.x + (this.width)-30;
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+function updateArena(){
+	var x,y;
+	for(var i=0; i<myObstacle.length; ++i){
+		if(player.crashWith(myObstacle[i])){
+			myGameArea.stop();
+	            mySound.play();
+			alert("Game Over");
+			return;
+		}
+	}
+	myGameArea.clear();
+	myGameArea.frameNo+=1;
+
+ctr+=myGameArea.frameNo;
+	if(myGameArea.frameNo == 150){
+		x = myGameArea.canvas.width;
+		y = myGameArea.canvas.height-80;
+		myObstacle.push(new component(5,20,"green",x,y));
+		myGameArea.frameNo = 0;
+	}
+	player.speedX=0;
+	player.speedY = 0;
+	if(myGameArea.key && myGameArea.key == 32)
+{
+		if(count == 0) count = 100;
+	}
+	if(count>66 && count <=100) {
+		player.speedX = 0;
+		player.speedY = -3;
+		player.newPos();
+		count--;
+	}
+	else if(count>33 && count<=66 ){
+		player.speedX = 0;
+		player.speedY = 0;
+		player.newPos();
+		count--;
+	}
+	else if(count>0 && count<=33 ) {
+		player.speedX = 0;
+		player.speedY = 3;
+		player.newPos();
+		count--;
+	}
+
+	myBackground1.speedX = -1;
+	myBackground1.speedY = 0;
+	myBackground1.newPos();
+	myBackground1.update();
+	myBackground2.speedX = -1;
+	myBackground2.speedY = 0;
+	myBackground2.newPos();
+	myBackground2.update();
+	player.update();
+	for(var i=0; i<myObstacle.length; ++i){
+		myObstacle[i].x+=-1;
+		myObstacle[i].update();
+	}document.getElementById("score").innerHTML=ctr;
+    myScore.update();
+	
+}
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }    
+}
+	</script>
+
+
+SCORE:<p id="score"></p>
+</body>
+</html>
