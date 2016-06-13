@@ -135,7 +135,7 @@ ctr+=myGameArea.frameNo;
 	}
 	else if(count>0 && count<=50 ){
 		player.speedX = 0;
-		player.speedY = 0;
+		player.speedY = 3;
 		player.newPos();
 		count--;
 	}
@@ -152,7 +152,7 @@ ctr+=myGameArea.frameNo;
 	for(var i=0; i<myObstacle.length; ++i){
 		myObstacle[i].x+=-1;
 		myObstacle[i].update();
-	}document.getElementById("score").innerHTML=(ctr/1000);
+	}document.getElementById("score").innerHTML=(ctr/10000);
     myScore.update();
 	
 }
